@@ -8,7 +8,11 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
+//import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -20,6 +24,9 @@ import com.ahmed.produits.entities.Categorie;
 import com.ahmed.produits.entities.Produit;
 import com.ahmed.produits.service.CategorieService;
 import com.ahmed.produits.service.ProduitService;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 
 @Controller
 public class ProduitController {
@@ -39,6 +46,9 @@ public class ProduitController {
 	{
 	Page<Produit> prods = produitService.getAllProduitsParPage(page, size);
 	modelMap.addAttribute("produits", prods);
+	
+	List<Categorie> cats = categorieService.getAllCategories();
+	modelMap.addAttribute("categories", cats);
 
 	modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
 
@@ -46,8 +56,74 @@ public class ProduitController {
 	return "listeProduits";
 	}
 	
+	/////////////////////////////////////////////////////////////////////////
+	@RequestMapping("/rechercherProduit")
+	public String rechercherProduit(ModelMap modelMap,
+			@RequestParam (name="page",defaultValue = "0") int page,
+			@RequestParam (name="size", defaultValue = "6") int size,
+			@RequestParam("nomProd") String nomProd,
+			@PageableDefault(page = 0, size = 6) Pageable pageable)
+
+	{
+	
+	List<Produit> pros = produitService.findByNomProduitContains(nomProd);
+	
+	int start = (int) pageable.getOffset();
+	int end = (int) ((start + pageable.getPageSize()) > pros.size() ? pros.size()
+					: (start + pageable.getPageSize()));
+	Page<Produit> prods = new PageImpl<Produit>(pros.subList(start, end), pageable, pros.size());
+	
+	//Ou bien 2eme methode
+	//PagedListHolder<Produit> prods = new PagedListHolder(pros);
+	//prods.setPageSize(10); // number of items per page
+	//prods.setPage(0);
+
+	
+	// list of items on this page .getContent()
+	modelMap.addAttribute("produits", prods.getContent());
+	
+
+	modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
+
+	modelMap.addAttribute("currentPage", page);
+	modelMap.addAttribute("nomProd", nomProd);
+	modelMap.addAttribute("mode", "nom");
+	return "recherche";
+	}
+	/////////////////////////////////////////////////////////////////////////
+	
+	@RequestMapping("/rechercherProduitByCatId")
+	public String rechercherProduitByCatId(ModelMap modelMap,
+			@RequestParam (name="page",defaultValue = "0") int page,
+			@RequestParam (name="size", defaultValue = "6") int size,
+			@RequestParam("id") Long id ,
+			@PageableDefault(page = 0, size = 6) Pageable pageable)
+
+	{
+		
+		List<Categorie> cats = categorieService.getAllCategories();
+		modelMap.addAttribute("categories", cats);
+		
+		List<Produit> pros = produitService.findByCategorieIdCat(id);
+		int start = (int) pageable.getOffset();
+		int end = (int) ((start + pageable.getPageSize()) > pros.size() ? pros.size()
+						: (start + pageable.getPageSize()));
+		Page<Produit> prods = new PageImpl<Produit>(pros.subList(start, end), pageable, pros.size());
+		modelMap.addAttribute("produits", prods.getContent());
+		
+
+		modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
+
+		modelMap.addAttribute("currentPage", page);
+		modelMap.addAttribute("id", id);
+		modelMap.addAttribute("mode", "id");
+		return "recherche";
+	}
 	
 	
+	
+	
+	/////////////////////////////////////////////////////////////////////////
 	@RequestMapping("/supprimerProduit")
 	public String supprimerProduit(@RequestParam("id") Long id,
 
@@ -72,19 +148,24 @@ public class ProduitController {
 	
 	@RequestMapping("/showCreate")
 	public String showCreate(ModelMap modelMap) {
-		modelMap.addAttribute("produit", new Produit());
-		
 		List<Categorie> cats= categorieService.getAllCategories();
+		Produit p = new Produit();
+		Categorie cat = new Categorie(0L,"Selectionnez","",null) ;
+		p.setCategorie(cat);
+		modelMap.addAttribute("produit", p);
+		
+		//cats.add(0, cat);
 		modelMap.addAttribute("categories", cats);
+		
 		
 		modelMap.addAttribute("mode", "new");
 		return "formProduit";
 	}
 	
 	@RequestMapping("/modifierProduit")
-	public String editerProduit(@RequestParam("id") Long id, ModelMap modelMap/*, @RequestParam(name = "idc", defaultValue = "1") int idc*/) {
+	public String editerProduit(@RequestParam("id") Long id, ModelMap modelMap) {
 		
-		//Genre c = categorieService.getCategorie(livreService.getLivre(id).getGenre().getIdGen());
+		
 		Categorie c = categorieService.getCategorie(produitService.getProduit(id).getCategorie().getIdCat());
 		modelMap.addAttribute("categorie", c);
 		
@@ -93,11 +174,6 @@ public class ProduitController {
 		
 		List<Categorie> cats= categorieService.getAllCategories();
 		modelMap.addAttribute("categories", cats);
-		
-		long idc = 1 ;
-		modelMap.addAttribute("idc", idc);
-		/*Long idca = p.getCategorie().getIdCat();
-		modelMap.addAttribute("idc", idca);*/
 		
 		modelMap.addAttribute("mode", "edit");
 		return "formProduit";
@@ -108,14 +184,18 @@ public class ProduitController {
 
 	
 	@RequestMapping("/saveProduit")
-	public String saveProduit(@Valid Produit produit ,BindingResult bindingResult, long idc /*, ModelMap modelMap*/)
+	public String saveProduit(@Valid Produit produit ,BindingResult bindingResult/*, long idc*/ /*, ModelMap modelMap*/)
 
 	{
-		if (bindingResult.hasErrors())
+		/*System.out.println(produit);
+		if (bindingResult.hasErrors() || (produit.getCategorie().getIdCat() == 0) )
 			return "formProduit";
-		Categorie ccc = categorieService.getCategorie(idc) ;
-		produit.setCategorie(ccc);
-		produitService.saveProduit(produit);
+		//Categorie ccc = categorieService.getCategorie(idc) ;
+		//produit.setCategorie(ccc);
+		else {
+			produitService.saveProduit(produit);
+			return "redirect:/ListeProduits";
+		}*/
 		
 		/*int page = 0;
 		int size = 2;
@@ -125,8 +205,10 @@ public class ProduitController {
 		modelMap.addAttribute("currentPage", page);
 		modelMap.addAttribute("size", size);
 		return "listeProduits";*/
+		if (bindingResult.hasErrors() )
+			return "formProduit";
 		
-		
+		produitService.saveProduit(produit);
 		return "redirect:/ListeProduits";
 		}
 		

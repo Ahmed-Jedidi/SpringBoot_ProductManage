@@ -54,6 +54,11 @@ public class Produit {
 	public void setCategorie(Categorie cat) {
 		this.categorie = cat;
 	}
+	@Override
+	public String toString() {
+		return "Produit [idProduit=" + idProduit + ", nomProduit=" + nomProduit + ", prixProduit=" + prixProduit
+				+ ", dateCreation=" + dateCreation + ", categorie=" + categorie + "]";
+	}
 	
     ////////////////////////////////////////////////////////////////////
 	/*public Produit() {

@@ -46,23 +46,34 @@
 							<span th:errors=${produit.dateCreation} class="text-danger"> </span>
 						</div>
 
-						<div class="form-group">
+						<!--  <div class="form-group">
 							<label class="control-label">Categorie :</label> 
 							<select
-								th:value="${idc}" type="text" name="idc" class="form-control"
-								multiple="false" required>
-								<option th:each="c:${categories}" th:if="${mode=='edit'}"
-									th:value="${c.idCat}" th:text="${c.nomCat}"
-									th:selected="${ c.idCat==produit.categorie.idCat}"></option>
-
-								<option th:each="c:${categories}" th:if="${mode=='new'}"
-									th:value="${c.idCat}" th:text="${c.nomCat}"></option>
+								th:value="${produit.categorie.idCat}" type="text" name="categorie" class="form-control"
+								 required>
 								
+								<option th:each="c:${categories}"
+									th:value="${c.idCat}" th:text="${c.nomCat}"
+									th:selected="${ c.idCat==produit.categorie.idCat}">
+								</option>
 							</select>
-							<!-- produit.categorie th:if="${c.idCat==produit.categorie.idCat}"  selected='selected' -->
-
-						</div>
-
+						</div> -->
+						<!--  <option th:if="${mode=='new'}" th:value='0' th:text="${'Selectionnez une categorie'}" ></option> -->
+						
+						<div class="form-group">
+                            	<label class="control-label">Categorie :</label>
+                            	<select    th:value="${produit.categorie.idCat}" type="text" name="categorie" class="form-control"
+								 multiple="false" required  >
+                                	<option th:each="c:${categories}" th:if="${mode=='edit'}"
+                                    	th:value="${c.idCat}" th:text="${c.nomCat}"
+                                    	th:selected="${ c.idCat==produit.categorie.idCat}">
+                                    </option>
+                                    
+                                	<option th:each="c:${categories}" th:if="${mode=='new'}"
+                                    	th:value="${c.idCat}" th:text="${c.nomCat}">
+                                    </option>
+                            	</select>
+   						</div>
 
 						<div>
 							<button type="submit" class="btn btn-primary" th:if="${mode=='new'}">Ajouter</button>
@@ -71,13 +82,6 @@
 						</div>
 
 					</form>
-				<!-- <table>
-					<tr th:each="c:${categories}">
-						<td th:text="${c.idCat}"></td>
-						<td th:text="${c.nomCat}"></td>
-						<td th:text="${c.descriptionCat}"></td>
-					</tr>
-				</table>-->
 				</div>
 			</div>
 		</div>

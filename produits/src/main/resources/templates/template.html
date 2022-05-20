@@ -9,28 +9,28 @@
 	src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <head>
 <meta charset="utf-8">
-<title>Gestion des Produits</title>
+<title>Book Management</title>
 </head>
 <body>
 	<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
 		<!-- Brand -->
-		<a class="navbar-brand" th:href="@{ListeProduits}">Gestion Produits</a>
+		<a class="navbar-brand" th:href="@{ListeProduits}">Book Management</a>
 		<!-- Links -->
 		<ul class="navbar-nav">
 			<li class="nav-item"><a class="nav-link" th:href="@{ListeProduits}">Home</a></li>
 			<!-- Dropdown -->
 			<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbardrop"
-				data-toggle="dropdown"> Produits </a>
+				data-toggle="dropdown"> Books </a>
 				<div class="dropdown-menu">
-					<a class="dropdown-item" th:href="@{showCreate}" sec:authorize="hasRole('ADMIN')">Ajouter</a> 
+					<a class="dropdown-item" th:href="@{showCreate}" sec:authorize="hasAnyRole('ADMIN','AGENT')">Add</a> 
 					<a class="dropdown-item" th:href="@{ListeProduits}">Lister</a>
 				</div>
 			</li>
 				<!-- Dropdown -->
 			<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbardrop"
-				data-toggle="dropdown"> Categorie </a>
+				data-toggle="dropdown"> Genre </a>
 				<div class="dropdown-menu">
-					<a class="dropdown-item" th:href="@{creerCategorie}" sec:authorize="hasRole('ADMIN')">Ajouter</a> 
+					<a class="dropdown-item" th:href="@{creerCategorie}" sec:authorize="hasAnyRole('ADMIN','AGENT')">Add</a> 
 					<a class="dropdown-item" th:href="@{ListeCategories}">Lister</a>
 				</div>
 			</li>

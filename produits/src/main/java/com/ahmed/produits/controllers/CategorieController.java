@@ -64,8 +64,8 @@ public class CategorieController {
 		Categorie c = categorieService.getCategorie(id);
 		modelMap.addAttribute("categorie", c);
 		
-		List<Categorie> cats= categorieService.getAllCategories();
-		modelMap.addAttribute("categories", cats);
+		//List<Categorie> cats= categorieService.getAllCategories();
+		//modelMap.addAttribute("categories", cats);
 		
 		modelMap.addAttribute("mode", "edit");
 		return "formCategorie";
@@ -75,8 +75,8 @@ public class CategorieController {
 	public String showCreate(ModelMap modelMap) {
 		modelMap.addAttribute("categorie", new Categorie());
 		
-		List<Categorie> cats= categorieService.getAllCategories();
-		modelMap.addAttribute("categories", cats);
+		//List<Categorie> cats= categorieService.getAllCategories();
+		//modelMap.addAttribute("categories", cats);
 		
 		modelMap.addAttribute("mode", "new");
 		return "formCategorie";

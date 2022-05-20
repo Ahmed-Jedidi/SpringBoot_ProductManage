@@ -49,7 +49,7 @@ return produitRepository.findAll(PageRequest.of(page, size));
 
 @Override
 public List<Produit> findByNomProduitContains(String nomProduit) {
-	return produitRepository.findByNomProduit(nomProduit);
+	return produitRepository.findByNomProduitContains(nomProduit);
 }
 @Override
 public List<Produit> findByNomProduit(String nom) {

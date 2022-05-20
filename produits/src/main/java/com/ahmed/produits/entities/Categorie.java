@@ -44,8 +44,7 @@ public class Categorie {
 
 	@Override
 	public String toString() {
-		return "Categorie [idCat=" + idCat + ", nomCat=" + nomCat + ", descriptionCat=" + descriptionCat + ", produits="
-				+ produits + "]";
+		return "Categorie [idCat=" + idCat + ", nomCat=" + nomCat + ", descriptionCat=" + descriptionCat +  "]";
 	}
 /*public Categorie() {}
 public Categorie(String nomCat, String descriptionCat, List<Produit> produits)
